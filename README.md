@@ -15,7 +15,11 @@ The data was **imported from INSEE and Santé Publique France**, then stored in 
 #### Technologies Used
 - **SQL** → Data storage and querying.  
 - **R (ggplot2, dplyr, DBI, knitr)** → Cleaning, analysis, and visualization.  
-- **R Markdown** → Generation of the report in HTML.  
+- **R Markdown** → Generation of the report in HTML.
+- 
+
+### Code, Data, and Analysis Report
+The R code allows for manipulating SQL databases to import and process data, performing descriptive and inferential statistical analyses on pandemic trends, and visualizing data using static graphs. The data used is stored as .csv files in the data/ folder. This code is available in the covid19_analysis_code_R.Rmd file, and the HTML result generated from this code is available in the covid19_analysis_report.html file.
 
 
 
