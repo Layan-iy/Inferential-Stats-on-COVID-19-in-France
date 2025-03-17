@@ -1,0 +1,1629 @@
+---
+title: "PROJET - STATISTIQUES INFERENTIELLE - INFORMATIQUE"
+date: "2024-03-14"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 5
+  toc: yes
+  lang: fr
+  word_document:
+    toc: yes
+    toc_depth: '5'
+  pdf_document: default
+editor_options:
+  markdown:
+    wrap: sentence
+---
+
+# Projet STATS-INFO UE MIOA403T
+
+
+ETIENNE Benoit, PLAT Margot, CARRERE Alex, ID YASSINE Layân, FRANCINE-HABAS Mathis\
+
+
+## 1.Construction de la base de données
+
+### 1.1.Le périmètre de l'étude
+
+
+Afin de mener une étude statistique descriptive (univariée/bivariée) sur la COVID-19 en France métropolitaine, nous avons créé une base de données regroupant de nombreuses informations à la fois sur la population française et différentes variables liées au virus.
+
+
+Nous avons récupéré les données mises à notre disposition et nous les avons enrichies à l'aide des statistiques disponibles sur le Web via l'**INSEE** et **Santé Publique France**.
+
+
+Le nombre de données concernant la COVID-19 étant très vaste, nous avons choisi de nous concentrer sur les années *2020* et *2021*, et plus particulièrement sur les 3 premières vagues de la pandémie en France Métropolitaine.
+Pour certaines données en cumul, nous avons également travaillé sur la photo au 31/12/2022.
+
+
+A l'appui de la base de données initiale, nous avons identifié 3 dates correspondant à des pics d'hospitalisations pour les 3 premières vagues de la pandémie :
+
+-   Le 14 avril 2020 (31990 hospitalisations) ;
+
+-   Le 16 novembre 2020 (33159 hospitalisations) ;
+
+-   Le 12 avril 2021 (30814 hospitalisations).
+
+Les vagues de la pandémie ont été déterminées sur la base de cinq mille nouvelles hospitalisations par semaine.
+Il y a eu 5 vagues en 2020 et 2021 (*cf table « PROJET_NOUVELLES_HOSPI »*).
+Nous avons fait le choix de retenir les 3 premières vagues pour l'étude :
+
+-   Vague 1 : (6 semaines), du 18/03 au 26/04/2020, un total de 20000 décès ;
+
+-   Vague 2 : (12 semaines), du 05/10/2020 au 03/01/2021, un total de 25000 décès ;
+
+-   Vague 3 : (19 semaines), du 04/01/2021 au 09/05/2021, un total de 40000 décès.
+
+
+Les vagues 2 et 3 sont jointives mais ont été dissociées par l'INSEE car les hospitalisations avaient baissé jusqu'à la fin de la 2^ième^ vague - sans passer sous la barre des 5000 nouvelles hospitalisations hebdomadaires - et sont reparties à la hausse dès le 4 janvier 2021.
+Nous avons repris ces éléments pour notre étude.
+
+
+### 1.2. Tables d'origine de la base de données
+
+-   **PROJET_DEP** : Code et nom des 96 départements de France métropolitaine ;
+
+-   **PROJET_NOUVELLES_HOSPI**: Nombre de nouvelles hospitalisations par semaine -- Données nationales ;
+
+-   **PROJET_LOGEMENT_SOCIAUX** : Nombre de logements sociaux et répartition entre les logements individuels et collectifs pour chacun des départements ;
+
+-   **PROJET_CHOMAGE** : Taux de chômage par département ;
+
+-   **PROJET_REVENU** : Indice de revenu fiscal par département ;
+
+-   **PROJET_POPU** : Répartition de la population par tranche d'âge par département ;
+
+-   **PROJET_HOSPIT** : Données quotidiennes relatives aux hospitalisations, aux personnes en réanimation, aux retours à domicile, aux décès en lien avec le COVID, par département et par sexe ;
+
+-   **PROJET_CLIMAT** : Température moyenne par jour et par département (non exploité pour cette étude) ;
+
+-   **PROJET_DENSITE** : Densité de population par département en 2018 (nombre d'habitants au km²) ;
+
+
+Ces tables ont été complétées lors de la création des variables comme nous le verrons dans le paragraphe *2.1.1 Liste des variables retenues*.
+
+
+## 2. Construction d'un tableau de données
+
+### 2.1. A partir de la base de données
+
+#### 2.1.1 Liste des variables retenues
+
+
+Afin de comparer les départements entre eux indépendamment de la population, nous avons ramené de nombreux indicateurs à la population du département.
+
+
+Pour ce faire, nous avons réalisé l'opération suivante pour chaque département (n°i) :
+
+```         
+nb_de_cas_pour_100_000_hab_du_dept_n°i = (nb_de_cas_dept_n°i/nb_hab_du_dept_n°i) * 100000
+```
+
+Concernant la population par sexe, nous sommes partis de l'hypothèse que les femmes représentent 51.7% de la population (*source. INSEE au 1er janvier 2020*).
+Nous avons appliqué ce coefficient pour l'ensemble des départements à partir de la table PROJET_POPU.
+
+Voici les variables créées et/ou sélectionnées pour l'étude, avec pour individus les départements de France Métropolitaine :
+
+-   1_Nombre d'hospitalisations pour 100 mille habitants le 14/04/2020 (pic d'hospitalisations de la vague 1) ;
+
+-   2_Nombre d'hospitalisations pour 100 mille habitants le 16/11/2020 (pic d'hospitalisations de la vague 2) ;
+
+-   3_Nombre d'hospitalisations pour 100 mille habitants le 12/04/2021 (pic d'hospitalisations de la vague 3) ;
+
+-   4_Nombre de réanimations pour 100 mille habitants le 14/04/2020 (pic d'hospitalisations de la vague 1) ;
+
+-   5_Nombre de réanimations pour 100 mille habitants le 16/11/2020 (pic d'hospitalisations de la vague 2) ;
+
+-   6_Nombre de réanimations pour 100 mille habitants le 12/04/2021 (pic d'hospitalisations de la vague 3) ;
+
+-   7_Nombre de décès pour 100 mille habitants au 31/12/2022 ;
+
+-   8_Nombre de décès au 31/12/2022 ;
+
+-   9_Nombre de décès pour 100 mille habitants pour la vague 1 (du 18 /03 au 26/04/2020) ;
+
+-   10_Nombre de décès pour 100 mille habitants pour la vague 2 (du 05/10/2020 au 03/01/2021) ;
+
+-   11_Nombre de décès pour 100 mille habitants pour la vague 3 (du 04/01 au 09/05/2021) ;
+
+-   12_Nombre de femmes décédées pour 100 mille femmes pour la vague 1 (du 18/03 au 26/04/2020) ;
+
+-   13_Nombre d'hommes décédés pour 100 mille hommes pour la vague 1 (du 18/03 au 26/04/2020) ;
+
+-   14_Nombre de femmes décédées pour 100 mille femmes pour la vague 2 (du 05/10/2020 au 03/01/2021) ;
+
+-   15_Nombre d'hommes décédés pour 100 mille hommes pour la vague 2 (du 05/10/2020 au 03/01/2021) ;
+
+-   16_Nombre de femmes décédées pour 100 mille femmes pour la vague 3 (du 04/01 au 09/05/2021) ;
+
+-   17_Nombre d'hommes décédés pour 100 mille hommes pour la vague 3 (du 04/01 au 09/05/2021) ;
+
+-   18_Répartition de la population par tranche d'âge en pourcentage ;
+
+-   19_Taux de chômage ;
+
+-   20_Niveau de densité de population (très faible \<50 à très fort \>1000) ;
+
+-   21_Nombre de logements sociaux collectifs pour 10 mille habitants.
+
+#### 2.1.2 Création des variables - Requêtes SQL dans MariaDB
+
+
+Voici les requêtes SQL réalisées pour la création de ces variables.
+Le numéro des variables correspond à la liste présentée en *2.1.1* :
+
+
+-   Requêtes pour déterminer le nombre d'hospitalisations par département pour 100k habitants le 14 avril 2020, le 16/11/2020 et le 12/04/2021 (variables 1 à 3) :
+
+```         
+#14/04/2020
+SELECT D.codeD, D.nomD, (nbrHospit/total)*100000  AS nb_hosp_pour_100000_hab_le_14_04_2020
+FROM PROJET_HOSPIT H
+INNER JOIN PROJET_DEP D on D.codeD = H.codeD
+INNER JOIN PROJET_POPU P on P.codeD = D.codeD
+WHERE jour = "14/04/2020" 
+GROUP BY D.codeD ;
+
+#16/11/2020
+SELECT D.codeD, D.nomD, (nbrHospit/total)*100000  AS nb_hosp_pour_100000_hab_le_16_11_2020
+FROM PROJET_HOSPIT H
+INNER JOIN PROJET_DEP D on D.codeD = H.codeD
+INNER JOIN PROJET_POPU P on P.codeD = D.codeD
+WHERE jour = "16/11/2020" 
+GROUP BY D.codeD ;
+
+#12/04/2021
+SELECT D.codeD, D.nomD, (nbrHospit/total)*100000 AS nb_hosp_pour_100000_hab_le_12_04_2021
+FROM PROJET_HOSPIT H
+INNER JOIN PROJET_DEP D on D.codeD = H.codeD
+INNER JOIN PROJET_POPU P on P.codeD = D.codeD
+WHERE jour = "12/04/2021" 
+GROUP BY D.codeD ;
+```
+
+
+-   Requêtes pour déterminer le nombre de réanimations par département pour 100k habitants le 14 avril 2020, le 16/11/2020 et le 12/04/2021 (variables 4 à 6) :
+
+```         
+#14/04/2020
+SELECT D.codeD, D.nomD, (nbrRea/total)*100000 AS nb_rea_pour_100000_hab_le_14_04_2020
+FROM PROJET_HOSPIT H
+INNER JOIN PROJET_DEP D on D.codeD = H.codeD
+INNER JOIN PROJET_POPU P on P.codeD = D.codeD
+WHERE jour = "14/04/2020" 
+GROUP BY D.codeD ;
+
+#16/11/2020
+SELECT D.codeD, D.nomD, (nbrRea/total)*100000 AS nb_rea_pour_100000_hab_le_16_11_2020
+FROM PROJET_HOSPIT H
+INNER JOIN PROJET_DEP D on D.codeD = H.codeD
+INNER JOIN PROJET_POPU P on P.codeD = D.codeD
+WHERE jour = "16/11/2020" 
+GROUP BY D.codeD ;
+
+#12/04/2021
+SELECT D.codeD, D.nomD, (nbrRea/total)*100000 AS nb_rea_pour_100000_hab_le_12_04_2021
+FROM PROJET_HOSPIT H
+INNER JOIN PROJET_DEP D on D.codeD = H.codeD
+INNER JOIN PROJET_POPU P on P.codeD = D.codeD
+WHERE jour = "12/04/2021" 
+GROUP BY D.codeD ;
+```
+
+
+-   Requête pour déterminer le nombre de décès pour 100k par département au 31/12/2022 (variable 7) :
+
+
+```         
+SELECT D.codeD, D.nomD, ((dc/P.total)*100000 ) AS dc_covid_31_12_2022_per_100k
+FROM PROJET_HOSPIT H
+INNER JOIN PROJET_DEP D on D.codeD = H.codeD
+INNER JOIN PROJET_POPU P on P.codeD = D.codeD
+WHERE jour = "31/12/2022" 
+GROUP BY D.codeD
+```
+
+
+-   Requête pour déterminer le nombre de décès au 31/12/2022 (variable 8) :
+
+```         
+SELECT D.codeD, D.nomD, dc AS dc_31_12_2022
+FROM PROJET_HOSPIT H
+INNER JOIN PROJET_DEP D on D.codeD = H.codeD
+WHERE jour="31/12/2022" 
+GROUP BY D.codeD ;
+```
+
+
+-   Requêtes pour déterminer le nombre de décès pour 100k habitants par département par vague pour les 3 vagues (variables 9 à 11) :
+
+```         
+#Nombre de décès pour 100k habitants par département - vague 1 (variable 9)
+SELECT D.codeD, D.nomD, ((dc/P.total)*100000 )AS dc_vague1_per_100k 
+FROM PROJET_HOSPIT H
+INNER JOIN PROJET_DEP D on D.codeD = H.codeD
+INNER JOIN PROJET_POPU P on P.codeD = D.codeD
+WHERE jour = "26/04/2020" and sexe = 0
+GROUP BY D.codeD ;
+
+#Nombre de décès pour 100k habitants par département - vague 2 (variable 10)
+SELECT D.codeD, D.nomD,((H1.dc - H2.dc) / P.total) * 100000 AS dc_vague2_per_100k
+FROM PROJET_HOSPIT H1
+INNER JOIN PROJET_HOSPIT H2 ON H2.codeD = H1.codeD
+INNER JOIN PROJET_POPU P ON H1.codeD = P.codeD
+INNER JOIN PROJET_DEP D on D.codeD = H1.codeD
+WHERE H1.jour = "03/01/2021" AND H2.jour = "04/10/2020" AND H1.sexe = 0  AND H2.sexe = 0
+GROUP BY D.codeD ;
+
+#Nombre de décès pour 100k habitants par département - vague 3 (variable 11)
+SELECT D.codeD, D.nomD,((H1.dc - H2.dc) / P.total) * 100000 AS dc_vague3_per_100k
+FROM PROJET_HOSPIT H1
+INNER JOIN PROJET_HOSPIT H2 ON H2.codeD = H1.codeD
+INNER JOIN PROJET_POPU P ON H1.codeD = P.codeD
+INNER join PROJET_DEP D on D.codeD = H1.codeD
+WHERE H1.jour="09/05/2021" AND H2.jour = "03/01/2021" AND H1.sexe = 0  AND H2.sexe = 0
+GROUP BY D.codeD ;
+```
+
+
+-   Requêtes pour déterminer le Nombre de décès pour 100k par sexe, par vague et par département (variables 12 à 17:
+
+```         
+#Le nombre de décès pour les femmes et pour les hommes a été rapporté à la population de femmes et d’hommes. Dans les formules, lire « 100k_femmes » et « 100k_hommes » au lieu de « 100k_hab »
+
+#Vague 1 femme (variable 12) :
+SELECT D.codeD, D.nomD, ((dc/P.femmes)*100000 )AS dc_vague1_femme_100k_hab
+FROM PROJET_HOSPIT H
+INNER JOIN PROJET_DEP D on D.codeD=H.codeD
+INNER JOIN PROJET_POPU_SEXE P on P.codeD = D.codeD
+WHERE jour = "26/04/2020" AND H.sexe = 2
+GROUP BY D.codeD ;
+
+#Vague 1 homme (variable 13) :
+SELECT D.codeD, D.nomD, ((dc/P.hommes)*100000 )AS dc_vague1_homme_100k_hab
+FROM PROJET_HOSPIT H
+INNER JOIN PROJET_DEP D on D.codeD = H.codeD
+INNER JOIN PROJET_POPU_SEXE P on P.codeD = D.codeD
+WHERE jour = "26/04/2020" AND H.sexe = 1
+GROUP BY D.codeD ;
+
+#Vague 2 femme (variable 14) :
+SELECT D.codeD, D.nomD,((H1.dc - H2.dc) / P.femmes) * 100000 AS dc_vague2_femme_100k_hab
+FROM PROJET_HOSPIT H1
+INNER JOIN PROJET_HOSPIT H2 ON H2.codeD = H1.codeD
+INNER JOIN PROJET_POPU_SEXE P ON H1.codeD = P.codeD
+INNER join PROJET_DEP D on D.codeD=H1.codeD
+WHERE H1.jour="03/01/2021" AND H2.jour = "04/10/2020" AND H1.sexe = 2 AND H2.sexe = 2
+GROUP BY D.codeD ;
+
+#Vague 2 homme (variable 15) :
+SELECT D.codeD, D.nomD,((H1.dc - H2.dc) / P.hommes) * 100000 AS dc_vague2_homme_100k_hab
+FROM PROJET_HOSPIT H1
+INNER JOIN PROJET_HOSPIT H2 ON H2.codeD = H1.codeD
+INNER JOIN PROJET_POPU_SEXE P ON H1.codeD = P.codeD
+INNER join PROJET_DEP D on D.codeD = H1.codeD
+WHERE H1.jour = "03/01/2021" AND H2.jour = "04/10/2020" AND H1.sexe = 1 AND H2.sexe = 1
+GROUP BY D.codeD ;
+
+#Vague 3 femme (variable 16) :
+SELECT D.codeD, D.nomD, ((H1.dc - H2.dc) / P.femmes) * 100000 AS dc_vague3_femme_100k_hab
+FROM PROJET_HOSPIT H1
+INNER JOIN PROJET_HOSPIT H2 ON H2.codeD = H1.codeD
+INNER JOIN PROJET_POPU_SEXE P ON H1.codeD = P.codeD
+INNER join PROJET_DEP D on D.codeD = H1.codeD
+WHERE H1.jour = "09/05/2021" AND H2.jour = "03/01/2021" and H1.sexe = 2 and H2.sexe = 2
+GROUP BY D.codeD ;
+
+#Vague 3 homme (variable 17) :
+SELECT D.codeD, D.nomD,((H1.dc - H2.dc) / P.hommes) * 100000 AS dc_vague3_homme_100k_hab
+FROM PROJET_HOSPIT H1
+INNER JOIN PROJET_HOSPIT H2 ON H2.codeD = H1.codeD
+INNER JOIN PROJET_POPU_SEXE P ON H1.codeD = P.codeD
+INNER JOIN PROJET_DEP D on D.codeD = H1.codeD
+WHERE H1.jour = "09/05/2021" AND H2.jour = "03/01/2021" AND H1.sexe = 1 AND H2.sexe = 1
+GROUP BY D.codeD ;
+```
+
+
+-   Requête pour déterminer la répartition de la population par département par tranche d'âge en pourcentage (variable 18) :
+
+```         
+select D.codeD, D.nomD, ((age0_19/total)*100) as "%_0_19", ((age20_39/total)*100) AS "%_20_39",((age40_59/total)*100) AS "%_40_59",((age60_74/total)*100) AS "%_60_74", ((age75_et_plus/total)*100) AS "%_75_et_plus"
+FROM PROJET_POPU P
+INNER JOIN PROJET_DEP D on D.codeD = P.codeD
+GROUP BY D.codeD ;
+```
+
+
+-   Requête pour déterminer le niveau de densité de population par département (variable 20) :
+
+```         
+SELECT DEP.codeD, DEP.nomD,
+    CASE
+        WHEN densite < 50 THEN '<50 très faible'
+        WHEN densite BETWEEN 50 AND 100 THEN '50 à 100 faible'
+        WHEN densite BETWEEN 100 AND 200 THEN '100 à 200 moyenne'
+        WHEN densite BETWEEN 200 AND 1000 THEN '200 à 1000 dense'
+        ELSE '>1000 très dense'
+    END AS niveau_densite
+FROM PROJET_DENSITE AS D
+INNER JOIN PROJET_DEP AS DEP ON DEP.codeD = D.codeD
+GROUP BY DEP.codeD ;
+```
+
+
+-   Requête pour déterminer le nombre de logements sociaux collectifs par département pour 10k habitants (variable 21) :
+
+```         
+SELECT D.codeD, D.nomD, ((nbLogSoc*partLogSocCollec)/100) AS nb_log_sociaux_coll_pour_10k_hab
+FROM PROJET_LOG_SOC L
+INNER JOIN PROJET_DEP D on D.codeD = L.codeD
+GROUP BY D.codeD ;
+```
+
+
+Les tables supplémentaires créées pour intégrer ces variables sont les suivantes :
+
+-   **PROJET_DECES_PAR_VAGUE** : Nombre de décès au 31/12/2022 et pour chacune des 3 premières vagues de la pandémie, ramenés à la population pour 100 mille habitants, par département ;
+
+-   **PROJET_PIC_DATES** : Nombre d'hospitalisations et de réanimations pour les 3 jours correspondant à des pics d'hospitalisation pour chacune des 3 premières vagues, ramenées à la population pour 100 00 habitants, par département ;
+
+-   **PROJET_DC_PAR_SEXE** : Nombre de décès par vague et par sexe, ramenés à la population pour 100 mille hommes ou femmes, par département ;
+
+-   **PROJET_POPU_SEXE** : PROJET_POPU complété du nombre d'hommes et de femmes par département ;
+
+-   **PROJET_DENSITE** : PROJET_DENSITE complété de la variable catégorielle « niveau de densité de très faible à très forte ».
+
+
+Les variables créées et sélectionnées pour l'étude ont été regroupées dans un Tableau de données appelé **PROJET_RECAP_TABLE**.
+
+
+#### 2.1.3 Création d'une table - Requête SQL
+
+
+Voici le code SQL que nous avons utilisé et adapté pour chaque table de notre base, prenons un exemple du code permettant la création de la table **PROJET_CHOMAGE** :
+
+```         
+CREATE TABLE PROJET_CHOMAGE ( 
+      codeD VARCHAR(3) NOT NULL,
+      indice_chomage FLOAT NOT NULL);
+
+    ALTER TABLE PROJET_CHOMAGE
+      ADD PRIMARY KEY (codeD) ;
+      
+    ALTER TABLE PROJET_CHOMAGE
+      ADD FOREIGN KEY (codeD) REFERENCES PROJET_DEP(codeD);
+```
+
+
+-- *codeD* est défini en tant que chaîne de caractère car la Corse à un numéro de département 2A/2B ;
+
+-- la clé primaire de la table est *codeD* ;
+
+-- *codeD* est une clé étrangère de la table **PROJET_DEP** ;
+
+-- Aucune de ces valeurs ne peuvent être nulles.
+
+
+### 2.2. Import des données de MariaDB dans R
+
+
+Voici le script en langage R permettant de faire la liaison entre MariaDB et Rstudio :
+
+```{r eval=TRUE, warning=FALSE}
+library(RMariaDB) #import du module
+
+#Connexion a un SGBD via R
+
+con = dbConnect(
+  drv = RMariaDB::MariaDB(), #driver de MariaDB
+  user = 'alex.carrere', #remplacer par le login utilisé pour l'ENT
+  password = rstudioapi::askForPassword("Mot de passe: "), #fenêtre demandant le mdp
+  host = '10.10.190.39', #adresse IP du serveur sur lequel MariaDB est installé
+  port = 3306, #port sur lequel le service MariaDB est accessible
+  dbname = '23_ASX_alex_carrere' #nom de la base de données
+)
+```
+
+
+Nous donnerons quelques exemples de requête d'importation des tables dans Rstudio :
+
+-   **Pour les informations de départements :**
+
+```{r eval=TRUE, echo=TRUE}
+PROJET_DEPARTEMENT = dbGetQuery(con, "SELECT * FROM PROJET_DEP ;")
+```
+
+```{r eval=TRUE,echo=FALSE}
+head(PROJET_DEPARTEMENT)
+```
+
+
+-   **Pour les informations sur la population :**
+
+```{r eval=TRUE, echo=TRUE}
+PROJET_POPU = dbGetQuery(con, "SELECT * FROM PROJET_POPU")
+```
+
+```{r eval=TRUE, echo=FALSE}
+head(PROJET_POPU)
+```
+
+
+-   **Pour les informations de chômage :**
+
+```{r eval=TRUE, echo=TRUE}
+PROJET_CHOMAGE = dbGetQuery(con, "SELECT * FROM PROJET_CHOMAGE ;")
+```
+
+```{r eval=TRUE, echo=FALSE}
+head(PROJET_CHOMAGE)
+```
+
+
+-   **Pour les informations des logements sociaux :**
+
+```{r eval=TRUE, echo=TRUE}
+PROJET_LOG_SOC = dbGetQuery(con, "SELECT * FROM PROJET_LOG_SOC" )
+```
+
+```{r eval=TRUE, echo=FALSE}
+head(PROJET_LOG_SOC)
+```
+
+
+-   **Pour les informations de revenu fiscal :**
+
+```{r eval=TRUE, echo=TRUE}
+PROJET_REVENU = dbGetQuery(con, "SELECT * FROM PROJET_REVENU")
+```
+
+```{r eval=TRUE, echo=FALSE}
+head(PROJET_REVENU)
+```
+
+
+-   **Pour les informations sur le climat :** A SUPPRIMER SI PAS UTILISE
+
+```{r eval=TRUE, echo=TRUE}
+PROJET_CLIMAT = dbGetQuery(con,"SELECT * FROM PROJET_CLIMAT")
+```
+
+```{r eval=TRUE, echo=FALSE}
+head(PROJET_CLIMAT)
+```
+
+
+-   **Pour les informations concernant les données d'hospitalisations :**
+
+```{r eval=TRUE, echo=TRUE}
+PROJET_HOSPIT = dbGetQuery(con, "SELECT * FROM PROJET_HOSPIT")
+```
+
+```{r eval=TRUE, echo=FALSE}
+head(PROJET_HOSPIT)
+```
+
+
+-   **Pour les informations concernant les nouvelles données d'hospitalisation :**\
+
+```{r eval=TRUE, echo=TRUE}
+PROJET_NOUVELLE_HOSPIT = dbGetQuery(con, "SELECT * FROM PROJET_NOUVELLES_HOSPIT")
+```
+
+```{r eval=TRUE, echo=FALSE}
+head(PROJET_NOUVELLE_HOSPIT)
+```
+
+
+-   **Pour les informations concernant le nombre de décès par vague :**
+
+```{r eval=TRUE, echo=TRUE}
+PROJET_DECES_PAR_VAGUE = dbGetQuery(con, "SELECT * FROM PROJET_DECES_PAR_VAGUE")
+```
+
+```{r eval=TRUE, echo=FALSE}
+head(PROJET_DECES_PAR_VAGUE)
+```
+
+
+-   **Pour les informations concernant le nombre de décès par vague et par sexe :**
+
+```{r eval=TRUE, echo=TRUE}
+PROJET_DECES_PAR_VAGUE_SEXE = dbGetQuery(con, "SELECT * FROM PROJET_DECES_PAR_VAGUE_SEXE")
+```
+
+```{r eval=TRUE, echo=FALSE}
+head(PROJET_DECES_PAR_VAGUE_SEXE)
+```
+
+
+-   **Pour les informations concernant la densité ???DE QUOI?? :**
+
+```{r eval=TRUE, echo=TRUE}
+PROJET_DENSITE = dbGetQuery(con, "SELECT * FROM PROJET_DENSITE")
+```
+
+```{r eval=TRUE, echo=FALSE}
+head(PROJET_DENSITE)
+```
+
+
+-   **Pour les informations concernant la répartition des hommes et femmes par département en 2022 :**
+
+```{r eval=TRUE, echo=TRUE}
+PROJET_POPU_SEXE = dbGetQuery(con, "SELECT * FROM PROJET_POPU_SEXE")
+```
+
+```{r eval=TRUE, echo=FALSE}
+head(PROJET_POPU_SEXE)
+```
+
+
+**Pour les informations concernant chaque pic de la pandémie :**\
+
+```{r eval=TRUE, echo=TRUE}
+PROJET_PIC_DATES = dbGetQuery(con, "SELECT * FROM PROJET_PIC_DATES")
+```
+
+```{r eval=TRUE, echo=FALSE}
+head(PROJET_PIC_DATES)
+```
+
+
+**Pour les informations concernant chaque pic de la pandémie :**\
+
+```{r eval=TRUE, echo=TRUE}
+PROJET_RECAP_TABLE = dbGetQuery(con, "SELECT * FROM PROJET_RECAP_TABLE")
+```
+
+```{r eval=TRUE, echo=FALSE}
+head(PROJET_RECAP_TABLE)
+```
+
+
+## 3.Statistiques descriptives
+
+### 3.1.Statistiques univariées
+
+#### 3.1.1.Etude du taux de décès pour cent mille habitants par département le 31/12/2022
+
+L'objectif de cette étude est d'identifier les départements les plus touchés par la pandémie, les moins touchés, mais aussi d'étudier la disparité.
+La date du 31/12/2022 est une date choisie de façon aléatoire, mais à un moment où la pandémie était déjà à un stade avancé (presque 3 ans après le début de la pandémie).
+
+
+Nous avons choisi la boîte-à-moustaches pour représenter les données, la façon dont elles se répartissent selon les départements.
+
+```{r eval=TRUE, echo=FALSE}
+summary(PROJET_DECES_PAR_VAGUE$dc_covid_31_12_2022_per_100k)
+```
+
+```{r eval=TRUE, echo=TRUE}
+boxplot(PROJET_DECES_PAR_VAGUE$dc_covid_31_12_2022_per_100k, main = "Diagramme des quartiles\n Décès pour cent mille habitants par département le 31/12/2022", ylab = "Décès pour cent mille habitants", col = "green")
+```
+
+
+**Commentaires :**
+
+
+Le Territoire de Belfort (90) est, de loin, le département qui compte le plus de décès liés à la COVID-19 depuis le début de la pandémie, en rapportant ce chiffre à la population totale du département.\
+
+D'après **Santé Publique France**, cette donnée s'expliquerait par un *« biais statistique»*.
+En effet, selon **Agnès Hochart**, déléguée territoriale de l'Agence Régionale de Santé en Franche-Comté, « *Il faudrait rapporter le nombre de décès à l'aire urbaine, au bassin de vie soigné par l'hôpital de Trévenans, puisqu'il soigne des patients venus du Territoire mais aussi du Doubs et de la Haute-Saône, soit au total 305.000 habitants. Si on rapporte le nombre de décès survenus dans cet hôpital à ce bassin de vie, on a un taux de mortalité beaucoup plus classique, autour de 230 décès pour 100.000 habitants.* » (Propos relevés par France Bleu le 25 janvier 2022).\
+
+En dehors du Territoire de Belfort, la distribution liée au taux de décès en raison de la COVID-19 est globalement symétrique (la moyenne est relativement proche de la médiane).\
+
+A ce jour, la moitié des départements français ont enregistré plus de 184.8 décès pour cent mille habitants, et l'autre moitié moins de 184.8 décès pour cent mille habitants.\
+
+L'écart interquartile étant assez faible au regard de la médiane (Q~3~-Q~1~ = 96.5), nous en déduisons que la distribution est assez concentrée autour de la médiane.
+Globalement, nous ne trouvons pas de grande disparité entre les départements, 50% des départements métropolitains ont eu entre 139.4 (Q~1~) et 235.9 (Q~2~) décès pour cent mille habitants.\
+
+La requête SQL nous a permis de connaître les cinq départements les plus/moins touchés par la pandémie ce jour :\
+
+```         
+#5 départements les moins touchés
+SELECT D.codeD, D.nomD, dc_covid_31_12_2022_per_100k
+FROM PROJET_DECES_PAR_VAGUE V inner join PROJET_DEP D on D.codeD = V.codeD
+ORDER BY dc_covid_31_12_2022_per_100k
+LIMIT 5 ;
+
+#5 départements les plus touchées
+SELECT D.codeD, D.nomD, dc_covid_31_12_2022_per_100k
+FROM PROJET_DECES_PAR_VAGUE V inner join PROJET_DEP D on D.codeD = V.codeD
+ORDER BY dc_covid_31_12_2022_per_100k DESC
+LIMIT 5 ;
+```
+
+Les départements les plus touchés sont le Territoire de Belfort (90), les Vosges (330), la Haute-Marne (316.2), la Moselle (311.8), l'Aisne (301.1).
+Parmis ces cinq départements, quatre se situent dans l'Est de la France.
+Les départements les moins touchés sont la Vendée (80.2), le Finistère (84.4), Les Côtes d'Armor (89.6), la Loire-Atlantique (96.3), et la Charente (103.3).
+Ces cinq départements se situent dans l'Ouest de la France.\
+
+Nous pouvons émettre deux hypothèses quant à cette disparité entre l'Est et l'Ouest de la France.
+Le premier facteur pouvant engendrer cette répartition est la situation géographique de ces régions vis-à-vis des pays limitrophes.
+En effet, les départements de l'Est sont des zones frontalières avec des pays qui ont eux aussi un taux d'incidence assez élevé (ex.Allemagne, Belgique, Italie).
+Ces zones sont potentiellement beaucoup traversées, ce qui peut favoriser la propagation du virus.
+A l'inverse, la Bretagne qui a peu de contacts avec l'extérieur est moins touchée par l'épidémie.\
+
+Deuxième hypothèse, le climat océanique plus doux est peut être moins favorable à la dispersion de la COVID-19.
+Ce qui nous laisse penser qu'un climat plus froid pourrait avoir une certaine influence sur la COVID-19.\
+
+
+#### 3.1.2.Etude du taux de décès pour cent mille habitants par départements pour chacune des trois premières vagues étudiées
+
+
+Pour l'analyse, il ne faut pas comparer les valeurs des trois variables entre elles, car la durée des vagues a été très variable (respectivement 6, 12, 19 semaines).Pour les comparer entre elles, nous aurions pu rapporter ces valeurs au nombre de semaines.\
+
+Il convient donc pour l'analyse, d'étudier ces variables indépendamment.\
+
+Nous avons choisi les boites-à-moustaches pour représenter ces trois variables.\
+
+```{r eval=TRUE, echo=FALSE}
+#Nombre de décès pour la vague 1 pour cent mille habitants
+summary(PROJET_DECES_PAR_VAGUE$dc_vague1_per_100k)
+#Nombre de décès pour la vague 2 pour cent mille habitants
+summary(PROJET_DECES_PAR_VAGUE$dc_vague2_per_100k)
+#Nombre de décès pour la vague 3 pour cent mille habitants
+summary(PROJET_DECES_PAR_VAGUE$dc_vague3_per_100k)
+```
+
+```{r eval=TRUE, echo=TRUE}
+boxplot(list(Vague_01 = PROJET_DECES_PAR_VAGUE$dc_vague1_per_100k, Vague_02 = PROJET_DECES_PAR_VAGUE$dc_vague2_per_100k, Vague_03 = PROJET_DECES_PAR_VAGUE$dc_vague3_per_100k), main = "Diagramme des quartiles\n Nombre de décès par vague pour cent mille habitants", ylab = "Nombre de décès pour cent mille habitants", col = c("pink", "purple", "lightgreen"))
+```
+
+
+**Commentaires :**\
+
+
+Concernant la vague 1, la moité des départements français ont eu entre 5.975 (Q1) et 27.325 (Q3) décès pour cent mille habitants.
+L'écart entre la moyenne et la médianne étant assez important, cela nous indique que la distribution n'est pas symétrique.\
+
+Concernant la vague 2, la moitié des départements français ont eu entre 21.82 et 50.70 décès pour cent mille habitants.
+Ici la distribution semble d'avantage symétrique, la distribution est moins concentrée autour de la médiane.\
+
+Concernant la vague 3, la moitié des départements métropolitains ont eu entre 24.45 et 65.85 décès pour cent mille habitants.
+La distribution semble cette fois ci symétrique car la médiane est très proche de la moyenne.
+Les données sont concentrées autour de la médiane.\
+
+Les requêtes SQL ci-dessous nous ont permis d'obtenir les données relatives aux départements français les plus/moins touchés pour chacune des 3 vagues étudiées.\
+
+Parmis les départements les moins touchés en vague 1, nous retrouvons des départements d'Occitanie comme la Lozère, le Tarn-et-Garonne, l'Ariège ainsi que des départements limitrophes comme le Lot-et-Garonne ou la Dordogne.
+Egalement en vague 2, ce sont les départements de l'Ouest de la France qui sont les moins touchés par la COVID-19 (Finistère, Charente-Maritime, Côte d'Armor, Vendée et la Dordogne à nouveau).
+Pour la dernière vague étudiée, nous retrouvons trois départements déjà cités de l'Ouest de la France (Finistère, Charente-maritime, Côte d'Armor) auxquels viennent s'ajouter le Gers et la Corse du sud.\
+
+Dans chacune des vagues, les départements les plus touchés toutes vagues confondues restent ceux de l'Est de la France comme Paris et le Val de Marne.\
+
+Ces valeurs coïncident avec l'étude *3.1.1*.
+Nous retrouvons majoritairement des départements de l'Ouest de la France.
+Aussi, il y a une vraie séparation quant à l'incidence du virus entre ces deux zones françaises.
+L'Est de la France a été d'avantage touché par la pandémie.\
+
+Parmis ceux les plus touchés, le Territoire de Belfort apparaît systématiquement en première position.
+A noter que la Lozère, département non impacté lors de la première vague, se retrouve aujourd'hui être l'un des plus touchés en vague deux.\
+
+
+Requête SQL permettant d'obtenir les extremums de la table de données :\
+
+```         
+#Vague 1
+##5 minimum
+SELECT D.codeD, D.nomD, dc_vague1_per_100k
+FROM PROJET_DECES_PAR_VAGUE V 
+INNER JOIN PROJET_DEP D on D.codeD = V.codeD
+ORDER BY dc_vague1_per_100k
+LIMIT 5 ;
+##5 maximum
+SELECT D.codeD, D.nomD, dc_vague1_per_100k
+FROM PROJET_DECES_PAR_VAGUE V 
+INNER JOIN PROJET_DEP D on D.codeD = V.codeD
+ORDER BY dc_vague1_per_100k
+LIMIT 5 ;
+
+#Vague 2
+##5 minimum
+SELECT D.codeD, D.nomD, dc_vague2_per_100k
+FROM PROJET_DECES_PAR_VAGUE V
+INNER JOIN PROJET_DEP D on D.codeD = V.codeD
+ORDER BY dc_vague2_per_100k
+LIMIT 5 ;
+##5 maximum
+SELECT D.codeD, D.nomD, dc_vague2_per_100k
+FROM PROJET_DECES_PAR_VAGUE V
+INNER JOIN PROJET_DEP D on D.codeD = V.codeD
+ORDER BY dc_vague2_per_100k
+LIMIT 5 ;
+
+#Vague 3
+#5minimum
+SELECT D.codeD, D.nomD, dc_vague3_per_100k
+FROM PROJET_DECES_PAR_VAGUE V
+INNER JOIN PROJET_DEP D on D.codeD = V.codeD
+ORDER BY dc_vague3_per_100k
+LIMIT 5 ;
+#5 maximum
+SELECT D.codeD, D.nomD, dc_vague3_per_100k
+FROM PROJET_DECES_PAR_VAGUE V
+INNER JOIN PROJET_DEP D on D.codeD = V.codeD
+ORDER BY dc_vague3_per_100k
+LIMIT 5 ;
+```
+
+
+#### 3.1.3.Etude des trois pics d'hospitalisations
+
+
+Cette fois, les représentations peuvent être comparées entre elles car il s'agit de photos prises un jour donné correspondant au pic des hospitalisations de chacune des 3 vagues.\
+
+
+Nous avons choisi les boites-à-moustaches pour représenter ces 3 variables.\
+
+```{r eval=TRUE, echo=FALSE}
+#Nombre d'hospitalisations pour cent mille habitant le 14/04/2020
+summary(PROJET_PIC_DATES$nb_hosp_pour_100000_hab_le_14_04_2020)
+#Nombre d'hospitalisations pour cent mille habitant le 16/11/2020
+summary(PROJET_PIC_DATES$nb_hosp_pour_100000_hab_le_16_11_2020)
+#Nombre d'hospitalisations pour cent mille habitant le 12/04/2021
+summary(PROJET_PIC_DATES$nb_hosp_pour_100000_hab_le_12_04_2021)
+```
+
+```{r eval=TRUE, echo=TRUE}
+boxplot(list(Pic_14_04_2020 = PROJET_PIC_DATES$nb_hosp_pour_100000_hab_le_14_04_2020, Pic_16_11_2020 = PROJET_PIC_DATES$nb_hosp_pour_100000_hab_le_16_11_2020, Pic_12_04_2021 = PROJET_PIC_DATES$nb_hosp_pour_100000_hab_le_12_04_2021), main = "Diagramme des quartiles\n Nombre d'hospitalisations pour cent mille habitants", ylab = "Nombre d'hospitalisations", col = c("orange", "green", "yellow"))
+```
+
+
+**Commentaires :**\
+
+
+La moyenne du nombre de personnes hospitalisées en raison de la COVID-19 était de 39.47, 50.03 et 42.69 pour cent mille habitants respectivement aux pics d'hospitalisations des vagues 1, 2 et 3.
+Cette augmentation peut être dûe à la difficulté des hôpitaux pour s'organiser face à cette survenance brutale de la pandémie.
+Lors des deux vagues suivantes, le virus était d'avantage connu et les hôpitaux mieux préparés afin d'accueillir plus de personnes, ce qui peux expliquer une hausse du nombre d'hospitalisations.\
+
+Nous retrouvons plusieurs départements avec des valeurs suspectes lors de la première vague, alors qu'il n'en restait plus que deux et une respectivement aux vagues deux et trois.\
+
+Sur le pic de la vague trois, la distribution est globalement symétrique (la moyenne est relativement proche de la médiane), ce qui n'était pas le cas en vague une.
+Cela montre une certaine disparité quant au développement de la pandémie.
+Elle s'est fortement développée lors de la première vague dans certains départements (Territoire de Belfort, Val-de-Marne, Paris, Haut-Rhin, Hauts-de-Seine).\
+
+Comme pour les deux études précédentes, nous observons que l'Est de la France est plus impacté par la COVID-19.\
+
+
+Les requêtes ci-dessous nous ont permis d'obtenir les extremums :\
+
+```         
+#14/04/2020
+##5 moins touchés
+SELECT D.codeD, D.nomD, nb_hosp_pour_100000_hab_le_14_04_2020   
+FROM PROJET_PIC_DATES DA inner join PROJET_DEP D on D.codeD = DA.codeD
+ORDER BY nb_hosp_pour_100000_hab_le_14_04_2020  
+LIMIT 5 ;
+##5 plus touchés
+SELECT D.codeD, D.nomD, nb_hosp_pour_100000_hab_le_14_04_2020   
+FROM PROJET_PIC_DATES DA inner join PROJET_DEP D on D.codeD = DA.codeD
+ORDER BY nb_hosp_pour_100000_hab_le_14_04_2020  desc
+LIMIT 5 ;
+
+#16/11/2020
+##5 moins touchés
+SELECT D.codeD, D.nomD, nb_hosp_pour_100000_hab_le_16_11_2020       
+FROM PROJET_PIC_DATES DA inner join PROJET_DEP D on D.codeD = DA.codeD
+ORDER BY nb_hosp_pour_100000_hab_le_16_11_2020
+LIMIT 5 ;
+##5 plus touchés
+SELECT D.codeD, D.nomD, nb_hosp_pour_100000_hab_le_16_11_2020       
+FROM PROJET_PIC_DATES DA inner join PROJET_DEP D on D.codeD = DA.codeD
+ORDER BY nb_hosp_pour_100000_hab_le_16_11_2020  desc
+LIMIT 5 ;
+
+#12/04/2021
+##5 moins touchés
+SELECT D.codeD, D.nomD, nb_hosp_pour_100000_hab_le_12_04_2021
+FROM PROJET_PIC_DATES DA inner join PROJET_DEP D on D.codeD = DA.codeD
+ORDER BY nb_hosp_pour_100000_hab_le_12_04_2021
+LIMIT 5 ;
+##5 plus touchés
+SELECT D.codeD, D.nomD, nb_hosp_pour_100000_hab_le_12_04_2021
+FROM PROJET_PIC_DATES DA inner join PROJET_DEP D on D.codeD = DA.codeD
+ORDER BY nb_hosp_pour_100000_hab_le_12_04_2021 desc
+LIMIT 5 ;
+```
+
+
+#### 3.1.4.Etude du taux de décès par sexe au regard des trois vagues étudiées
+
+
+Nous avons choisi d'analyser des données par sexe afin de savoir si les hommes et les femmes ont été impactés de façon identique ou non par la pandémie.\
+
+Nous avons fait 2 boites-à-moustaches pour chacune des 3 vagues sur la base du nombre de décès pour cent mille hommes et femmes.\
+
+Nous sommes partis de l'hypothèse que les femmes représentent 51,7% de la population française (*source. INSEE au 1er janvier 2020*).
+Nous prendrons en compte les durées différentes des trois vagues pour l'analyse.\
+
+```{r eval=TRUE, echo=FALSE}
+#Vague 1
+##Femmes
+summary(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague1_femme_100k_hab)
+##Hommes
+summary(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague1_homme_100k_hab)
+#Vague 2
+##Femmes
+summary(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague2_femme_100k_hab)
+##Hommes
+summary(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague2_homme_100k_hab)
+#Vague 3
+##Femmes
+summary(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague3_femme_100k_hab)
+##Hommes
+summary(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague3_homme_100k_hab)
+```
+
+```{r eval=TRUE, echo=TRUE}
+#Vague 1
+boxplot(list("Décès femmes" = PROJET_DECES_PAR_VAGUE_SEXE$dc_vague1_femme_100k_hab, "Décès Hommes"=PROJET_DECES_PAR_VAGUE_SEXE$dc_vague1_homme_100k_hab), main="Diagramme des quartiles\n Décès pour 100 000 hab par sexe - Vague 1 - par département", col = c("green", "blue"))
+
+#Vague 2
+boxplot(list("Décès femmes" = PROJET_DECES_PAR_VAGUE_SEXE$dc_vague2_femme_100k_hab, "Décès Hommes"=PROJET_DECES_PAR_VAGUE_SEXE$dc_vague2_homme_100k_hab), main="Diagramme des quartiles\n Décès pour 100 000 hab par sexe - Vague 2 - par département", col = c("green", "blue"))
+
+#Vague 3
+boxplot(list("Décès femmes" = PROJET_DECES_PAR_VAGUE_SEXE$dc_vague3_femme_100k_hab, "Décès Hommes"=PROJET_DECES_PAR_VAGUE_SEXE$dc_vague3_homme_100k_hab), main="Diagramme des quartiles\n Décès pour 100 000 hab par sexe - Vague 3 - par département", col = c("green", "blue"))
+```
+
+
+**Commentaires :**\
+
+
+On constate une constante : il y a plus de décès chez les hommes que chez les femmes, toutes vagues confondues.\
+
+En comparant les moyennes, on s'aperçoit que la proportion est d'environ 60/40 : 60% des personnes décédées sont des hommes et 40% sont des femmes.\
+
+Au cours de la vague 1, plusieurs départements ont des taux de décès suspects, ce qui n'est plus le cas sauf exceptions en vague 2 et 3.\
+
+Concernant la vague 1, les deux distributions ne sont pas symétriques (l'écart entre la moyenne et la médiane est trop important).
+L'écart-interquartile est plus faible chez les femmes, aussi le nombre de décès chez les femmes est plus concentré autour de la moyenne, les données sont plus étalées chez les hommes.
+Le classement des départements les plus touchés est le même entre les hommes et les femmes pour quatre départements sur cinq (Territoire de Belfort, Haut-Rhin, Vosges, Val-de-Marne. Le 5^ième^ département est la Moselle pour les femmes, et Paris pour les hommes.\
+
+Concernant la vague 2, la distribution est d'avantage symétrique (l'écart entre la moyenne et la médiane est assez faible), les données sont plus concentrées autour de la moyenne.
+Chez les hommes, la distribution est moins symétrique que chez les femmes, elle est également plus étalée.
+Trois départements sont classés parmi les cinq plus touchés et communs entre les deux sexes (Territoire de Belfort, Savoie et Lozère).\
+
+Concernant la vague 3, pour les deux sexes, la distribution est symétrique (les moyennes sont sensiblement égales aux médianes).
+L'écart-interquartile est plus important chez les hommes, ce qui signifie que leur distribution est moins concentrée.
+Deux départements sont classés parmi les cinq plus touchés et communs entre les deux sexes (Territoire de Belfort et Aisne).\
+
+Globalement, les femmes sont moins touchées par la pandémie.
+Lors des deux premières vagues, la disparité du nombre de décès pour cent mille habitants par département était plus importante.\
+
+Nous étudierons dans la partie statistique bivariée la corrélation entre ces 2 variables.\
+
+
+Requête SQL permettant d'obtenir les extremums :\
+
+```         
+#Vague 1
+##Femmes
+SELECT D.codeD, D.nomD, dc_vague1_femme_100k_hab
+FROM PROJET_DECES_SEXE_VAGUE SV inner join PROJET_DEP D on D.codeD = SV.codeD
+ORDER BY dc_vague1_femme_100k_hab desc
+LIMIT 5 ;
+##Hommes
+SELECT D.codeD, D.nomD, dc_vague1_homme_100k_hab
+FROM PROJET_DECES_SEXE_VAGUE SV inner join PROJET_DEP D on D.codeD = SV.codeD
+ORDER BY dc_vague1_homme_100k_hab desc
+LIMIT 5 ;
+
+#Vague 2
+##Femmes
+SELECT D.codeD, D.nomD, dc_vague2_femme_100k_hab
+FROM PROJET_DECES_SEXE_VAGUE SV inner join PROJET_DEP D on D.codeD = SV.codeD
+ORDER BY dc_vague2_femme_100k_hab desc
+LIMIT 5 ;
+##Hommes
+SELECT D.codeD, D.nomD, dc_vague2_homme_100k_hab
+FROM PROJET_DECES_SEXE_VAGUE SV inner join PROJET_DEP D on D.codeD = SV.codeD
+ORDER BY dc_vague2_homme_100k_hab desc
+LIMIT 5 ;
+
+#Vague 3
+##Femmes
+SELECT D.codeD, D.nomD, dc_vague3_femme_100k_hab
+FROM PROJET_DECES_SEXE_VAGUE SV inner join PROJET_DEP D on D.codeD = SV.codeD
+ORDER BY dc_vague3_femme_100k_hab desc
+LIMIT 5 ;
+##Hommes
+SELECT D.codeD, D.nomD, dc_vague3_homme_100k_hab
+FROM PROJET_DECES_SEXE_VAGUE SV inner join PROJET_DEP D on D.codeD = SV.codeD
+ORDER BY dc_vague3_homme_100k_hab desc
+LIMIT 5 ;
+```
+
+
+#### 3.1.5.Etude du niveau de densité de population par département en 2018
+
+
+Nous avons choisi de déterminer des tranches, au regard de la disparité des données et de présenter cette variable sous forme de *camembert*.
+En effet, la densité va de 15 habitants au km² pour le département 48 (la Lozère) à 20720 hab/km² pour le département 75 (Paris).\
+
+Cet indicateur peut être intéressant à analyser en étude bivariée si on part de l'hypothèse que la concentration de la population augmente les risques de propagation du virus.\
+
+```{r eval=TRUE, echo=FALSE}
+summary(PROJET_DENSITE$densite)
+```
+
+```{r eval=TRUE, echo=TRUE}
+pie(table(PROJET_DENSITE$niveau_densite), main = "Diagramme en secteur\n Dénsité d'habitants par km² par département", ylab = "Densité d'habitants au km²")
+```
+
+
+**Commentaires :**\
+
+
+Sur ce graphique, on observe qu'environ deux tiers des départements ont une densité faible voir très faible et un tiers ont une densité moyenne voir dense.
+Quatre départements d'Île-de-France ont une densité **très forte** (supérieure à 1000hab/km^2^) : Paris, Hauts-de-Seine, Seine-Saint-Denis et Val-de-Marne.
+Étant donnée la transmission rapide de la covid-19 lorsque les personnes sont regroupées, nous nous demanderons lors de l'étude bivariée si les départements les plus denses ont été d'avantage touchés par la covid-19 proportionnellement à la population.\
+
+
+Requête permettant d'obtenir les départements avec la densité **très forte** :\
+
+```         
+SELECT D.codeD, D.nomD, DENS.niveau_densite
+FROM PROJET_DENSITE DENS INNER JOIN PROJET_DEP D ON D.codeD = DENS.codeD
+WHERE niveau_densite=">1000 très dense" ;
+```
+
+
+#### 3.1.6.Etude du taux de chômage par département en troisième trismetre 2021
+
+
+Nous avons choisi une représentation en boîte à moustache.\
+
+```{r eval=TRUE, echo=FALSE}
+summary(PROJET_CHOMAGE$indice_chomage)
+```
+
+```{r eval=TRUE, echo=TRUE}
+boxplot(PROJET_CHOMAGE$indice_chomage, main = "Diagramme des quartiles\n Taux de chômage", ylab = "Indice du chômage", col = "lightblue")
+```
+
+
+**Commentaires :**\
+
+
+Nous observons une moyenne de chômage par département de 7.753.\
+
+La médiane est de 7.500.
+Cela signifie que la moitié des départements ont un indice de chômage inférieur ou égal à 7.500.
+Ainsi, l'autre moitié a un indice de chômage supérieur ou égal à 7.500.\
+
+La moyenne étant relativement égale à la médiane, on peut en déduire que la distribution est symétrique par rapport à la médiane.\
+
+Le premier quartile est de 6.70.
+Cela signifie que 25% des départements ont un indice de chômage inférieur ou égal à 6.70.\
+
+Le troisième quartile est de 8.50.
+Cela signifie que 75% des départements ont un indice de chômage inférieur ou égal à 8.50.\
+
+L'écart interquartile (Q3 - Q1) est de 1.8 (8.50 - 6.70), ce qui indique une certaine concentration des données autour de la médiane.
+Cela peut signifier qu'il n'y a pas de différence significative entre les différents départements français.\
+
+Le Cantal (15) détient l'indice de chômage le plus bas de France.
+C'est une région majoritairement rurale avec des revenus faibles ce qui permet de maintenir une taux de chômage moins important que dans les autres départements.\
+
+À l'inverse, le département des Pyrénéennes orientales compte le plus fort taux de chômage.
+Cela peut s'expliquer par un niveau de formation faible au sein de la population active ainsi que par un déséquilibre entre l'attractivité du département et son développement économique moins important (**source. INSEE**).\
+
+
+Voici la requête effectuée pour trouver les extremums (ex.maximum) :\
+
+```         
+SELECT D.codeD, D.nomD, indice_chomage
+FROM PROJET_CHOMAGE  C inner join PROJET_DEP D on D.codeD=C.codeD
+ORDER BY indice_chomage desc
+LIMIT 3;
+```
+
+
+#### 3.1.7.Etude du nombre de logements sociaux collectifs pour dix mille habitants
+
+
+Nous avons choisi d'analyser la variable des logements sociaux collectifs, en partant de l'hypothèse que la concentration de la population augmente les risques de propagation de la COVID-19, analyse qui ne pourrait se faire qu'en étude bivariée.\
+
+Pour cette variable, nous avons choisi la boite-à-moustaches.\
+
+```{r eval=TRUE, echo=FALSE}
+summary(PROJET_LOG_SOC$nb_log_sociaux_coll_pour_10k_hab)
+```
+
+```{r eval=TRUE, echo=TRUE}
+boxplot(PROJET_LOG_SOC$nb_log_sociaux_coll_pour_10k_hab, main = "Diagramme des quartiles\n Nombre de logements sociaux collectifs pour dix mille habitants par département", ylab = "Nombre de logements sociaux collectifs pour dix mille habitants", col = "red")
+```
+
+
+**Commentaires :**\
+
+
+Il y a en moyenne 536.9 logements sociaux collectifs pour dix mille habitants par département.
+50% des départements français ont plus de 510.5 logements sociaux collectifs pour dix mille habitants et 50% en ont moins.\
+
+La différence entre la moyenne et la médiane (536.9-510.5) est de 26.4 ; au regard de la valeur de la médiane, la distribution est symétrique.
+Les variables sont plus concentrées autour de la médiane.\
+
+25% des départements ont moins de 384 logements sociaux collectifs pour dix mille habitants et 75% en ont moins de 632.5.\
+
+La différence interquartile (Q3-Q1) est de 248.8.
+La différence entre la moyenne et l'écart interquartile est de 288.1.
+Cet écart est assez significatif, nous pouvons donc suggérer une certaine dispersion des données.\
+
+La Vendée (85) a le nombre de logements sociaux collectifs pour dix mille habitants (176)le plus faible en France.\
+
+La Seine-Saint-Denis (93), le Val-de-Marne (94) et les Hauts-de-Seine (92) ont le plus fort taux de logements sociaux collectifs pour dix mille habitants.
+Cela coïncide avec l'étude précédente, ces départements figurent dans la liste des départements les plus denses.\
+
+La Seine-Saint-Denis compte le plus fort taux de logements sociaux collectifs ramené à la population (1354).
+Cela coïncide avec le fait que ce département est le plus pauvre de France métropolitaine (Information obtenue grâce à une requête SQL sur l'indice de revenu des habitant par département).
+Nous conjecturerons l'existence possible d'un lien (non étudié ici) entre l'indice de revenu par habitants et le nombre de logements sociaux collectifs pour dix mille habitants.\
+
+
+Requête permettant d'obtenir les extremums (ex.minimum) :\
+
+```         
+SELECT D.codeD, D.nomD, LS.nb_log_sociaux_coll_pour_10k_hab
+FROM PROJET_LOG_SOC LS  inner join PROJET_DEP D on D.codeD = LS.codeD
+ORDER BY nb_log_sociaux_coll_pour_10k_hab desc
+LIMIT 4 ;
+```
+
+
+#### 3.1.8.Etude de la répartition de la population par tranche d'âge par département
+
+
+Nous avons choisi de représenter la répartition de la population par tranche d'âge à l'aide de boites-à-moustaches.
+Pour cela nous avons calculé le pourcentage de chaque tranche d'âge pour chaque département.
+
+```{r eval=TRUE, echo=FALSE}
+#0-19
+summary(PROJET_RECAP_TABLE$pourcentage_0_19)
+
+#20-39
+summary(PROJET_RECAP_TABLE$pourcentage_20_39)
+#40-59
+summary(PROJET_RECAP_TABLE$pourcentage_40_59)
+#60-74
+summary(PROJET_RECAP_TABLE$pourcentage_60_74)
+#75+
+summary(PROJET_RECAP_TABLE$pourcentage_75_et_plus)
+```
+
+```{r eval=TRUE, echo=TRUE}
+boxplot(list("0-19 ans"=PROJET_RECAP_TABLE$pourcentage_0_19, "20-39 ans"=PROJET_RECAP_TABLE$pourcentage_20_39, "40-59 ans"=PROJET_RECAP_TABLE$pourcentage_40_59, "60-74 ans"=PROJET_RECAP_TABLE$pourcentage_60_74,"75 ans et +"=PROJET_RECAP_TABLE$pourcentage_75_et_plus), main="Diagramme des quartiles\n Répartition de la population par tranche d'âge en % par département", ylab="pourcentage", col=c("green", "purple", "yellow", "blue", "orange"))
+```
+
+
+**Commentaires :**\
+
+
+Les distributions sont symétriquement réparties (les moyennes sont respectivement proches des médianes).\
+
+A noter toutefois que les départements de Seine-Saint-Denis et Val-d'Oise ont une proportion de personnes âgées de 0-19 ans atypique (29% de la population), comparée à la moyenne qui est de 22.4%.
+D'un même temps, la part des 75 ans et plus en Seine-Saint-Denis est la plus faible de France avec 5.2% de la population du département ; suite le Val d'Oise avec 6.1% de la population.\
+
+A Paris, la classe 20-39 ans représente 33% de la population, ce qui est atypique par rapport à la moyenne nationale de 21.6%.
+Une analyse sociologique permettrait peut-être d'expliquer cela par le marché du travail et/ou la vie animée de la capitale.\
+
+La population des 40-59 ans est répartie de façon très homogène sur le territoire, avec un minimum de 24.4% de la population à un maximum de 27.8% pour cette classe d'âge.\
+
+
+Requête permettant d'obtenir les extremums pour chaque tranche d'âge (ex. maximum des 0_19 ans) :\
+
+```         
+SELECT codeD, nomD, pourcentage_0_19 
+FROM PROJET_RECAP_TABLE
+ORDER BY pourcentage_0_19 DESC
+LIMIT 2 ;
+```
+
+
+### 3.2.Statistiques Bivariées
+
+#### 3.2.1.Etude d'un lien entre le nombre d'hospitalisations et le nombre de réanimations pour cent mille habitants par département
+
+
+Demandons s'il existe une possible corrélation entre le nombre d'hospitalisations et le nombre de réanimation.
+Pour cela, nous allons nous concentrer sur trois dates précises, le 14/04/2020 16/11/2020 et 12/04/2021.
+Nous avons choisi ces dates car elles correspondent à des pics d'hospitalisations et de décès.\
+
+Les données seront pour cent mille habitants et par département.\
+
+
+##### 3.2.1.1.Représentation en nuage de points
+
+
+Dans un premier temps, nous allons utiliser la représentation en nuage de point, afin de conjecturer la présence ou non d'un lien entre ces deux variables pour chacune des dates indiquées.\
+
+Dans un second temps, nous utiliserons la méthode dite du Khi-2 pour valider ou non notre conjecture, puis la méthode de cramer nous permettra de calculer l'intensité du lien.\
+
+Nous créerons deux data-frame identiques contenant les données spécifiques à notre étude car l'un des deux sera modifié dans la seconde partie.\
+
+```{r eval=TRUE, echo=TRUE}
+#Création du data-frame contenant les variables à étudier
+df_hospit_vs_rea <- PROJET_PIC_DATES[c('nb_hosp_pour_100000_hab_le_14_04_2020', 'nb_hosp_pour_100000_hab_le_16_11_2020', 'nb_hosp_pour_100000_hab_le_12_04_2021', 'nb_rea_pour_100000_hab_le_14_04_2020', 'nb_rea_pour_100000_hab_le_16_11_2020', 'nb_rea_pour_100000_hab_le_12_04_2021')]
+```
+
+```{r eval=TRUE, echo=FALSE}
+head(df_hospit_vs_rea)
+```
+
+Utilisation de la fonction **par()** pour visualiser les trois dates sur le même écran.\
+
+```{r eval=TRUE, echo=TRUE}
+par(mfrow = c(2, 2))
+
+####################
+#14/04/2020
+####################
+
+#Création de la droite de régression linéaire pour le 14/04/2020
+reglin_hospit_vs_rea_14_04_2020 = lm(nb_rea_pour_100000_hab_le_14_04_2020 ~ nb_hosp_pour_100000_hab_le_14_04_2020, df_hospit_vs_rea)
+
+#Création de la représentation graphique
+plot(df_hospit_vs_rea$nb_hosp_pour_100000_hab_le_14_04_2020, df_hospit_vs_rea$nb_rea_pour_100000_hab_le_14_04_2020, main = "Nuage de points\n Nbre d'hospit vs. nbre de réa 14/04/2020", xlab = "Nombre d'hospit", ylab = "Nombre de réa")
+
+#Affichage de la droite de régression
+abline(reglin_hospit_vs_rea_14_04_2020, col = "blue", lwd = 3)
+
+####################
+#16/11/2020
+####################
+
+#Création de la droite de régression linéaire pour le 16/11/2020
+reglin_hospit_vs_rea_16_11_2020 = lm(nb_rea_pour_100000_hab_le_16_11_2020 ~ nb_hosp_pour_100000_hab_le_16_11_2020, df_hospit_vs_rea)
+#Création de la représentation graphique
+
+plot(df_hospit_vs_rea$nb_hosp_pour_100000_hab_le_16_11_2020, df_hospit_vs_rea$nb_rea_pour_100000_hab_le_16_11_2020, main = "Nuage de points\n Nbre d'hospit vs. nbre de réa 16/11/2020", xlab = "Nombre d'hospit", ylab = "Nombre de réa")
+
+#Affichage de la droite de régression linéaire
+abline(reglin_hospit_vs_rea_16_11_2020, col = "orange", lwd = 3)
+
+####################
+#12/04/2021
+####################
+
+#Création de la droite de régression linéaire
+reglin_hospit_vs_rea_12_04_2021 = lm(nb_rea_pour_100000_hab_le_12_04_2021 ~ nb_hosp_pour_100000_hab_le_12_04_2021, df_hospit_vs_rea)
+
+#Création de la représentation graphique
+plot(df_hospit_vs_rea$nb_hosp_pour_100000_hab_le_12_04_2021, df_hospit_vs_rea$nb_rea_pour_100000_hab_le_12_04_2021, main = "Nuage de points\n Nbre d'hospit vs. nbre de réa le 12/04/2021", xlab = "Nombre d'hospit", ylab = "Nombre de réa")
+
+#Affichage de la droite de régression linéaire
+abline(reglin_hospit_vs_rea_12_04_2021, col = "green", lwd = 3)
+
+```
+
+
+**Commentaires :**\
+
+
+Au 14/04/2020, la représentation semble nous indique une forte corrélation entre le nombre d'hospitalisations et le nombre de réanimations pour cent mille habitants.
+En effet, les points sont concentrés autour de la droite de régression linéaire.
+Nous pouvons conjecturer que ces deux variables sont liées avec une forte intensité.\
+
+Au 16/11/2020, les points sont concentrés autour de la droite de régression mais avec une plus grande disparité.
+Nous conjecturons que ces deux variables sont également liées mais avec une intensité plus faible que lors du premier pics.\
+
+Au 12/04/2021, les points sont moins concentrés autour de la droite de régression.
+Nous conjecturons que ces deux variables restent tout de même liées à cette date mais avec une intensité encore plus faible que lors du premier pics.
+Cependant, les points semblent plus concentrés autour de la droite de régression que lors du deuxième pic.\
+
+Aussi, il ya une tendance.
+Le nombre d'hospitalisations semble avoir eu une incidence sur le nombre de réanimations lors des trois pics de la pandémie, mais avec une intensité décroissante jusqu'au second pic puis croissant jusqu'au troisième pic.
+Cela traduit peut-être une meilleure prise en charge lors des hospitalisations qui diminue le nombre de réanimations en proportion, avec une disparité selon les départements.\
+
+
+#####3.2.1.2.Utilisation de la méthode du Khi-2
+
+
+Ces variable sont **quantitatives discrètes**, elles ne possèdent pas les caractéristiques nécessaires à l'application de la méthode du Khi-2.
+Aussi, nous allons transformer les variables quantitatives en variables qualitatives.\
+
+
+Dans un premier temps nous définissons un nouveau data-frame contenant les variables à étudier :\
+
+-   Le code du département ;
+-   Le nombre d'hospitalisations pour chacune des trois dates pour cent mille habitants ;
+-   Le nombre de réanimations pour chacune des trois dates pour cent mille habitants.
+
+```{r eval=TRUE, echo=TRUE}
+#Création du data-frame contenant les variables à étudier
+df_hospit_vs_rea_2 <- PROJET_PIC_DATES[c('nb_hosp_pour_100000_hab_le_14_04_2020', 'nb_hosp_pour_100000_hab_le_16_11_2020', 'nb_hosp_pour_100000_hab_le_12_04_2021', 'nb_rea_pour_100000_hab_le_14_04_2020', 'nb_rea_pour_100000_hab_le_16_11_2020', 'nb_rea_pour_100000_hab_le_12_04_2021')]
+```
+
+Ensuite, nous transformerons les variables du data-frame en variable catégorielles grâce à une fonction python et aux seuils déjà établis dans notre étude univariée.
+Rappelons les informations utiles :\
+
+```{r eval=TRUE, echo=FALSE}
+summary(df_hospit_vs_rea_2)
+```
+
+```{r eval=TRUE, echo=TRUE}
+#Nombre d'hospitalisations au 14/04/2020
+for (i in 1:nrow(df_hospit_vs_rea_2)) { #Ciblage de chaque lignes une à une
+  if (as.integer(df_hospit_vs_rea_2[i, 1]) < 15.880) { #Valeur du premier quartile
+    df_hospit_vs_rea_2[i, 1] <- 'A très faible hospit'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 1]) < 27.350) { #Valeur du second quartile
+    df_hospit_vs_rea_2[i, 1] <- 'B faible hospit'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 1]) < 55.050) { #Valeur du troisième quartile
+    df_hospit_vs_rea_2[i, 1] <- 'C forte hospit'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 1]) > 55.050)  { #Valeur du troisième quartile
+    df_hospit_vs_rea_2[i, 1] <- 'D très forte hospit'
+  }
+}
+
+df_hospit_vs_rea_2$nb_hosp_pour_100000_hab_le_14_04_2020 = as.factor(df_hospit_vs_rea_2$nb_hosp_pour_100000_hab_le_14_04_2020) #Permet l’interprétation en variables catégorielles
+
+#Nombre d'hospitalisations au 16/11/2020
+for (i in 1:nrow(df_hospit_vs_rea_2)) {
+  if (as.integer(df_hospit_vs_rea_2[i, 2]) < 32.950) {
+    df_hospit_vs_rea_2[i, 2] <- 'A très faible hospit'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 2]) < 42.800) {
+    df_hospit_vs_rea_2[i, 2] <- 'B faible hospit'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 2]) < 63.850) {
+    df_hospit_vs_rea_2[i, 2] <- 'C forte hospit'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 2]) > 63.850) {
+    df_hospit_vs_rea_2[i, 2] <- 'D très forte hospit'
+  }
+}
+
+df_hospit_vs_rea_2$nb_hosp_pour_100000_hab_le_16_11_2020 = as.factor(df_hospit_vs_rea_2$nb_hosp_pour_100000_hab_le_16_11_2020)
+
+#Nombre d'hospitalisations au 12/04/2021
+for (i in 1:nrow(df_hospit_vs_rea_2)) {
+  if (as.integer(df_hospit_vs_rea_2[i, 3]) < 26.880) {
+    df_hospit_vs_rea_2[i, 3] <- 'A très faible hospit'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 3]) < 39.050) {
+    df_hospit_vs_rea_2[i, 3] <- 'B faible hospit'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 3]) < 57.880) {
+    df_hospit_vs_rea_2[i, 3] <- 'C forte hospit'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 3]) > 57.880) {
+    df_hospit_vs_rea_2[i, 3] <- 'D très forte hospit'
+  }
+}
+
+df_hospit_vs_rea_2$nb_hosp_pour_100000_hab_le_12_04_2021 = as.factor(df_hospit_vs_rea_2$nb_hosp_pour_100000_hab_le_12_04_2021)
+
+#Nombre de réanimations au 14/04/2020
+for (i in 1:nrow(df_hospit_vs_rea_2)) {
+  if (as.integer(df_hospit_vs_rea_2[i, 4]) < 3.700) {
+    df_hospit_vs_rea_2[i, 4] <- 'A très faible réa'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 4]) < 6.150) {
+    df_hospit_vs_rea_2[i, 4] <- 'B faible réa'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 4]) < 10.500) {
+    df_hospit_vs_rea_2[i, 4] <- 'C forte réa'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 4]) > 10.500) {
+    df_hospit_vs_rea_2[i, 4] <- 'D très forte réa'
+  }
+}
+
+df_hospit_vs_rea_2$nb_rea_pour_100000_hab_le_14_04_2020 = as.factor(df_hospit_vs_rea_2$nb_rea_pour_100000_hab_le_14_04_2020)
+
+#Nombre de réanimations au 16/11/2020
+for (i in 1:nrow(df_hospit_vs_rea_2)) {
+  if (as.integer(df_hospit_vs_rea_2[i, 5]) < 3.800) {
+    df_hospit_vs_rea_2[i, 5] <- 'A très faible réa'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 5]) < 6.000) {
+    df_hospit_vs_rea_2[i, 5] <- 'B faible réa'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 5]) < 8.050) {
+    df_hospit_vs_rea_2[i, 5] <- 'C forte réa'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 5]) > 8.050) {
+    df_hospit_vs_rea_2[i, 5] <- 'D très forte réa'
+  }
+}
+
+df_hospit_vs_rea_2$nb_rea_pour_100000_hab_le_16_11_2020 = as.factor(df_hospit_vs_rea_2$nb_rea_pour_100000_hab_le_16_11_2020)
+
+#Nombre de réanimations au 12/04/2021
+for (i in 1:nrow(df_hospit_vs_rea_2)) {
+  if (as.integer(df_hospit_vs_rea_2[i, 6]) < 3.900) {
+    df_hospit_vs_rea_2[i, 6] <- 'A très faible réa'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 6]) < 6.200) {
+    df_hospit_vs_rea_2[i, 6] <- 'B faible réa'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 6]) < 8.350) {
+    df_hospit_vs_rea_2[i, 6] <- 'C forte réa'
+  }else if (as.integer(df_hospit_vs_rea_2[i, 6]) > 8.350) {
+    df_hospit_vs_rea_2[i, 6] <- 'D très forte réa'
+  }
+}
+
+df_hospit_vs_rea_2$nb_rea_pour_100000_hab_le_12_04_2021 = as.factor(df_hospit_vs_rea_2$nb_rea_pour_100000_hab_le_12_04_2021)
+```
+
+Nous avons ensuite créer trois tableaux recensent les données des deux variables pour chaque date :\
+
+```{r eval=TRUE, echo=TRUE}
+#14/04/2020
+count_14_04_2020 = table(df_hospit_vs_rea_2$nb_hosp_pour_100000_hab_le_14_04_2020, df_hospit_vs_rea_2$nb_rea_pour_100000_hab_le_14_04_2020)
+#16/11/2020
+count_16_11_2020 = table(df_hospit_vs_rea_2$nb_hosp_pour_100000_hab_le_16_11_2020, df_hospit_vs_rea_2$nb_rea_pour_100000_hab_le_16_11_2020)
+#12/04/2021
+count_12_04_2021 = table(df_hospit_vs_rea_2$nb_hosp_pour_100000_hab_le_12_04_2021, df_hospit_vs_rea_2$nb_rea_pour_100000_hab_le_12_04_2021)
+#Affichage
+count_14_04_2020
+count_16_11_2020
+count_12_04_2021
+```
+
+Critères du Khi-2 au 14/04/2020 : - Hypothèse nulle : "Les deux variables sont indépendantes à cette date" ; - Le risque alpha est de 5%.\
+
+Critères du Khi-2 au 16/11/2020 : - Hypothèse nulle : "Les deux variables sont indépendantes à cette date" ; - Le risque alpha est de 5%.\
+
+Critères du Khi-2 au 12/04/2021 : - Hypothèse nulle : "Les deux variables sont indépendantes à cette date" ; - Le risque alpha est de 5%.\
+
+
+Calculons les oméga :\
+
+```{r eval=TRUE, echo=TRUE, warning=FALSE}
+#14/04/2020
+res_14_04_2020 = chisq.test(count_14_04_2020)
+res_14_04_2020$statistic
+#16/11/2020
+res_16_11_2020 = chisq.test(count_16_11_2020)
+res_16_11_2020$statistic
+#12/04/2021
+res_12_04_2021 = chisq.test(count_12_04_2021)
+res_12_04_2021$statistic
+```
+
+
+Avec un degrés de liberté de 9 ((4-1)\*(4-1)) et un alpha=5%, nous trouvons 16.919 comme valeur seuil du Khi-2.
+Ce qui nous permet de rejeter l'hypothèse nulle.\
+
+Il y a donc un lien entre le nombre d'hospitalisation et le nombre de réanimation pour cent mille habitants par département pour les trois dates retenues.\
+
+
+#####3.2.1.3.Détermination de l'intensité du lien.
+
+
+Cependant nous devons nuancer nos propos.
+Dans la première partie, nous avons conjecturer que l'intensité de la liaison ne semblait pas égale pour les trois pics observés.
+Nous allons donc calculer l'intensité du lien pour chacune des dates.\
+
+
+Pour cela, nous utilisons la méthode de cramer vue en cours, grâce à la formule ci-contre :\
+
+```{r eval=TRUE, echo=TRUE, warning=FALSE}
+cramer.v = function(TABLECOUNT){
+  khi2 = chisq.test(TABLECOUNT)$statistic
+  ntot = sum(TABLECOUNT)
+  L = nrow(TABLECOUNT)
+  C = ncol(TABLECOUNT)
+  V_C = sqrt(khi2 / (ntot * (min(L, C) - 1)))
+  return(V_C)
+}
+```
+
+Associions notre table à la fonction **cramer.v** :\
+
+
+```{r eval=TRUE, echo=FALSE, warning=FALSE}
+cramer.v(count_14_04_2020)
+cramer.v(count_16_11_2020)
+cramer.v(count_12_04_2021)
+```
+
+
+**Commentaires :**\
+
+
+Enfin, les trois valeurs sont supérieures à 0.3 aussi l'intensité des liaison est assez forte.
+Le nombre d'hospitalisations a une incidence sur le nombre de réanimations pour cent mille habitants par département en France métropolitaines.
+Notre conjecture est donc validé car l'intensité du premier pics est supérieure aux deux autres **POURQUOI**, lors du second pic, le nombre d'hospitalisations avait moins d'influence sur le nombre de réanimations **POURQUOI**.
+Mais lors du troisième pic, ces deux variables sont d'avantages liées **POURQUOI**.\
+
+
+#### 3.2.2.Etude d'un Lien éventuel entre le nombre de décès dus à la COVID-19 au 31/12 /2022 et la part des 75 ans et plus
+
+
+Comme nous ne disposons pas de l'âge des patients décédés dans notre base de données - on connait la date, le département, le sexe, mais pas l'âge - et qu'il semble que les personnes âgées sont plus exposées au risque de décès en raison de la COVID-19, nous mènerons une étude des variables **Nombre-de-décès-dus-à-la-COVID-19** et **Nombre-de-personnes-ayant-75+** en statistique bivariée.
+Nous sommes partis de la photo des décès dus à la COVID-19 au 31/12/2022 et nous avons mis en regard la population des 75 ans et + pour chaque département.\
+
+
+Nous avons bâti un nuage de points avec la droite de régression :\
+
+```{r eval=TRUE, echo=FALSE}
+#Droite de régression linéaire
+reglin75ans=lm(PROJET_DECES_PAR_VAGUE$dc_covid_31_12_2022~PROJET_POPU$age75_et_plus)
+#Nuage de points
+plot(PROJET_POPU$age75_et_plus, PROJET_DECES_PAR_VAGUE$dc_covid_31_12_2022, xlab="75 ans et +", ylab="décès au 31 12 2022", main="Nuage de points\n part des 75 ans+ et décès au 31 12 2022")
+#Affichage
+abline(reglin75ans, col="blue", lwd=4)
+```
+
+
+Calcul du coefficient de corrélation :\
+
+
+```{r eval=TRUE, echo=FALSE}
+cor(PROJET_POPU$age75_et_plus, PROJET_DECES_PAR_VAGUE$dc_covid_31_12_2022)
+```
+
+
+Nous ne disposons pas de l'âge des personnes décédées parmi les données.
+Cela nous aurait peut-être permis de démontrer que le taux de mortalité suite au COVID était plus fort chez les 75 ans et +, que chez les plus jeunes.\
+
+Les valeurs sont rapprochées autour de la droite de régression linéaire, il y a une faible dispersion.
+De plus l'incide de corrélation linéaire entre les deux variables de notre étude est de 0.85 (rappelons que cet indice est compris entre 0-1).
+Aussi, nous pouvons conclure que **oui** il y a un lien fort entre la part des 75 ans et plus dans la population française métropolitaine et le nombre de décès par département pour cent mille habitants au 31/12/2022.\
+
+
+#### 3.2.3.Etude du nombre de décès pour cent mille habitants au 31/12/20222 et du nombre de logements sociaux collectifs pour dix mille habitants
+
+
+Afin de savoir s'il y a une corrélation entre le nombre de logements sociaux collectifs et le nombre de décès au 31/12/2022, nous avons calculé le coefficient de corrélation et bâti un nuage de points.\
+
+```{r eval=TRUE, echo=FALSE}
+cor(PROJET_LOG_SOC$nb_log_sociaux_coll_pour_10k_hab, PROJET_DECES_PAR_VAGUE$dc_covid_31_12_2022_per_100k)
+```
+
+```{r eval=TRUE, echo=TRUE}
+plot(PROJET_LOG_SOC$nb_log_sociaux_coll_pour_10k_hab, PROJET_DECES_PAR_VAGUE$dc_covid_31_12_2022_per_100k, , main="Nuage de points\n Logements sociaux collectifs et décès COVID-19 au 31/12/2022", xlab="Logements collectifs pour 10 000 habitants", ylab="décès au 31/12/2022 pour 100 000 habitants")
+```
+
+
+**Commentaires :**\
+
+
+Il y a une certaine corrélation (0.45) mais ce n'est pas avéré partout.\
+
+Là où il y a le moins de logements sociaux collectifs par rapport à la population, on a des taux de décès en raison de la COVID-19 en dessous de 200 décès pour cent mille habitants. On voit que les taux de décès élevés se trouvent dans les départements où les logements sociaux collectifs sont les plus importants (*resp.3.1.7*).\
+
+Le Territoire de Belfort ressort au-dessus du nuage avec un taux de décès atypique comme évoqué plus haut dans l'étude.
+A noter toutefois que ce département fait partie de ceux dont les taux de logements sociaux collectifs sont les plus élevés de France.\
+
+Aussi, il est nécessaire de nuancer l'indice de corrélation obtenu. Le nombre de logements sociaux a un lien avec le nombre de décès au 31/12/2022 dans les départements présentant un nombre important de logements sociaux.\
+
+
+#### 3.2.4.Etude du taux de décès des femmes (resp.hommes) pour 100 000 femmes (resp.hommes) durant les trois vagues étudiées
+
+
+Nous avons vu lors de l'étude univariée que les hommes avaient un taux de décès plus important en raison de la COVID-19 que les femmes.
+On va essayer de savoir ici, si cette conjecture s'applique sur le territoire pour chacune des 3 vagues faisant l'objet de l'étude.\
+
+Pour cela, nous calculons le coefficient de corrélation et dessinons un nuage de points avec une droite de régression.\
+
+```{r eval=TRUE, echo=FALSE}
+#Vague 1
+##Femmes
+summary(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague1_femme_100k_hab)
+##Hommes
+summary(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague1_homme_100k_hab)
+#Vague 2
+##Femmes
+summary(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague2_femme_100k_hab)
+##Hommes
+summary(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague2_homme_100k_hab)
+#Vague 3
+##Femmes
+summary(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague3_femme_100k_hab)
+##Hommes
+summary(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague3_homme_100k_hab)
+```
+
+```{r eval=TRUE, echo=TRUE}
+#Vague 1
+reglin4 = lm(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague1_homme_100k_hab~PROJET_DECES_PAR_VAGUE_SEXE$dc_vague1_femme_100k_hab)
+plot(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague1_femme_100k_hab, PROJET_DECES_PAR_VAGUE_SEXE$dc_vague1_homme_100k_hab, xlab="Décès femmes", ylab="Décès hommes", main="Nuage de points\n Droite de régression - Décès femmes vs hommes - vague 1");
+abline(reglin4, col="lightblue", lwd=4)
+
+#Vague 2
+reglin5=lm(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague2_homme_100k_hab~PROJET_DECES_PAR_VAGUE_SEXE$dc_vague2_femme_100k_hab)
+plot(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague2_femme_100k_hab, PROJET_DECES_PAR_VAGUE_SEXE$dc_vague2_homme_100k_hab, xlab="Décès femmes", ylab="Décès hommes", main="Nuage de points\n Droite de régression - Décès femmes vs hommes - vague 2");
+abline(reglin5, col="lightgreen", lwd=4)
+
+#Vague 3
+reglin6=lm(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague3_homme_100k_hab~PROJET_DECES_PAR_VAGUE_SEXE$dc_vague3_femme_100k_hab)
+plot(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague3_femme_100k_hab, PROJET_DECES_PAR_VAGUE_SEXE$dc_vague3_homme_100k_hab, xlab="Décès femmes", ylab="Décès hommes", main="Nuage de points\n Droite de régression - Décès femmes vs hommes - vague 3");
+abline(reglin6, col="lightpink", lwd=4)
+```
+
+```{r eval=TRUE, echo=FALSE}
+#Vague 1
+cor(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague1_femme_100k_hab, PROJET_DECES_PAR_VAGUE_SEXE$dc_vague1_homme_100k_hab)
+#Vague 2
+cor(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague2_femme_100k_hab, PROJET_DECES_PAR_VAGUE_SEXE$dc_vague2_homme_100k_hab)
+#Vague 3
+cor(PROJET_DECES_PAR_VAGUE_SEXE$dc_vague3_femme_100k_hab, PROJET_DECES_PAR_VAGUE_SEXE$dc_vague3_homme_100k_hab)
+```
+
+
+**Commentaires :**\
+
+
+Le coefficient de corrélation entre les deux variables taux de décès chez les femmes et taux de décès chez les hommes toutes vagues confondues est très élevé.
+Aussi, l'hypothèse de l'étude *3.1.4* est confirmée.
+Il y a bien un lien très fort entre le nombre de décès par sexe et la pandémie mondiale.\
+
+Il y a une forte corrélation pour les trois vagues entre le nombre de décès chez les femmes et le nombre de décès chez les hommes.
+Toutefois, l'échelle des axes et des ordonnées démontrent que le taux de surmortalité dû au COVID est supérieur chez les hommes que chez les femmes.
+Cela confirme ce qui avait été vu lors de l'étude univariée.\
+
+
+#### 3.2.5.Etude des variables Décès pour 100 000 habitants au 31/12/20222 et densité de population
+
+
+Pour terminer cette étude, nous avons travaillé sur une variable quantitative et une variable qualitative.\
+
+
+Afin de mesurer l’intensité de la liaison entre la variable quantitative (nombre de décès dus au COVID au 31/12/2022) et la variable catégorielle (niveau de densité de très faible à très fort). Nous avons bâti un histogramme en activant le package *Lattice*, puis nous avons calculé le rapport de corrélation.
+
+
+```{r eval=TRUE, echo=TRUE}
+library(lattice)
+#  Code du graphique avec le package lattice
+histogram(~PROJET_RECAP_TABLE$dc_covid_31_12_2022_pour_100000_hab| PROJET_RECAP_TABLE$niveau_densite, data=PROJET_RECAP_TABLE, main="Histogramme\nNbre de décès+densité de population pour cent mille habitants 31/12/2022", xlab = "dc_covid_31_12_2022_pour 100000")
+```
+
+```{r eval=TRUE, echo=TRUE}
+# Formule du rapport de corrélation : 
+rs_lm=lm(PROJET_RECAP_TABLE$dc_covid_31_12_2022_pour_100000_hab~PROJET_RECAP_TABLE$niveau_densite, data=PROJET_RECAP_TABLE)
+rap_cor=sqrt(summary(rs_lm)$r.squared)
+rap_cor
+```
+
+L’intensité du lien  entre la densité de population et le nombre de décès dus au COVID par habitant étant inférieur à 0.3, nous pouvons conclure que ce lien est faible.
+
+
+**Commentaires :**\
+
+
+Le rapport de corrélation à 0.29 et ce graphique montrent qu’il n’y a pas de rapport direct et systématique entre le niveau de densité de population et le taux de décès. Il peut y avoir des taux de décès assez élevés dans des départements à très faible ou faible densité et des taux de décès « modérés » dans des départements à très forte densité, car d’autres critères interviennent. Par exemple, le taux de décès est moindre en Seine-Saint-Denis alors que la densité y est très forte. Mais nous avons vu par ailleurs que la population des 75 ans et + est faible en proportion dans ce même département.\
+
+
+## 4.Conclusion
+
+
+Notre étude concerne la COVID-19 avec pour individus les départements de France Métropolitaine.\
+
+
+Elle a porté plus particulièrement sur :\
+
+-   les trois premières vagues de la pandémie en 2020 et 2021 (du 18/03 au 26/04/2020 ; du 05/10/2020 au 03/01/2021 et du 04/01/2021 au 09/05/2021) ;
+-   les pics d'hospitalisations pour chacune de ces 3 vagues (le 14/04/2020, le 16/11/2020 et le 14/04/2021) ;
+-   la photo au 31/12/2022 après environ 3 ans de pandémie.
+
+L'étude univariée nous a permis d'analyser plusieurs variables :\
+
+-   le taux de décès au 31/12/2022 ;
+-   le taux d'hospitalisations pour cent mille habitants lors des trois pics d'hospitalisations ;
+-   le taux de décès par vague ; - le taux de décès par vague et par sexe ;
+-   la répartition de la population par tranche d'âge ;
+-   le taux de chômage ;
+-   le niveau de densité de population au km^2^ ;
+-   le taux de logements sociaux collectifs.
+
+
+L'étude bivariée a permis d'étudier la corrélation ou non entre deux variables :\
+
+-   taux d'hospitalisations et taux de réanimations pour les trois pics d'hospitalisation ;
+-   taux de décès chez les hommes et taux de décès chez les femmes pour chaque vague ;
+-   le nombre de décès au 31/12/2022 et la nombre de personnes ayant 75 ans et + ;
+-   taux de décès au 31/12/2022 et taux de logements sociaux collectifs ;
+-   niveau de densité et aux de décès au 31/12/2022.
+
+
+**Ce que l'on peut retenir en synthèse :**\
+
+
+Le territoire de Belfort ressort comme une « anomalie » avec un taux de décès lié à la COVID-19 très élevé de l'ordre de 696 pour cent mille habitants au 31/12/2022, alors que la moyenne nationale était de 196. Aussi, nous avons recherché des explications sur internet. Un biais statistique est évoqué. Ce département aurait comptabilisé des décès de personnes qui résidaient dans des départements limitrophes mais qui étaient hospitalisées dans le Territoire de Belfort.\
+
+
+Parmi les tendances, on peut noter que plusieurs départements de l'est de la France ont été impactés très vite et plus fortement que dans le reste du territoire. A contrario, plusieurs départements de l'Ouest et du Sud ont été impactés dans une moindre mesure.\
+
+
+Ce qui ressort de l'étude également, c'est une exposition plus forte des hommes au risque de décès en raison à la COVID-19. Le taux de décès chez les hommes est nettement supérieur à celui des femmes, de l'ordre de 1.5 fois plus ; ce qui va dans le même sens que la longévité qui est supérieure chez les femmes (**source. INSEE**). Là aussi, il faudrait des études pour tenter d'expliciter ce phénomène.\
+
+
+Concernant les risques liés aux logements sociaux collectifs ou à la densité de population, il n'y pas de lien direct et systématique avec les personnes décédées du à la COVID-19 quand on rapporte les chiffres à la population. Néanmoins, il y a une certaine corrélation (0.45). Là où le nombre de logements sociaux collectifs est faible, nous avons des taux de décès en raison du la COVID-19 en dessous de 200. Nous constatons que les taux de décès élevés se trouvent dans les départements où les logements sociaux collectifs sont plus importants.\
+
+
+Les personnes aggées semblent avoir été particulièrement touchées par la COVID-19 ; nous manquions de données sur ce point dans notre base de données.\
+
+
+Ce rapport nous montre qu'au-delà des statistiques qui peuvent donner des tendances, les analyses doivent également se faire sur des études multicritères. Par exemple, le département de Seine-Saint-Denis a une proportion de jeunes largement au-delà de la moyenne et peu de personnes âgées de 75 ans et + en proportion. Pourtant on y retrouve un taux de mortalité dû au COVID plutôt élevé. C'est un département où la densité est forte, avec un niveau élevé d'immigration (*l'accès aux sions est moindre*), de la cohabitation multigénérationnelle supérieure à la moyenne nationale et des conditions de vie plus précaires que sur le reste du territoire, ce qui a probablement augmenté la transmission du virus.\
