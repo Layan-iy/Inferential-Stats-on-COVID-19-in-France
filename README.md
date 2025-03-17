@@ -18,7 +18,7 @@ This research was conducted in French, and all datasets, labels, and documents a
 - **SQL** → Data storage and querying.  
 - **R (ggplot2, dplyr, DBI, knitr)** → Cleaning, analysis, and visualization.  
 - **R Markdown** → Generation of the report in HTML.
-- 
+
 
 ### Code, Data, and Analysis Report
 The R code allows for manipulating SQL databases to import and process data, performing descriptive and inferential statistical analyses on pandemic trends, and visualizing data using static graphs. The data used is stored as .csv files in the data/ folder. This code is available in the covid19_analysis_code_R.Rmd file, and the HTML result generated from this code is available in the covid19_analysis_report.html file.
