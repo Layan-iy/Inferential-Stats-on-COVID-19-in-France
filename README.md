@@ -1,1 +1,22 @@
-# Inferential-Stats-on-COVID-19-in-France
+# Statistical Analysis of COVID-19 in France
+
+### Project Description
+This project aims to **analyze the trends and impacts of the COVID-19 pandemic in mainland France** using descriptive and inferential statistical methods.
+
+The study covers **the years 2020 and 2021**, with a particular focus on **the first three epidemic waves**.  
+The data was **imported from INSEE and Santé Publique France**, then stored in an **SQL** database before being analyzed with **R**.
+
+### Data and Methodology
+
+#### Data Sources
+- **INSEE** → Demographic and socio-economic data.  
+- **Santé Publique France** → Data on the evolution of cases, hospitalizations, and deaths related to COVID-19.  
+
+#### Technologies Used
+- **SQL** → Data storage and querying.  
+- **R (ggplot2, dplyr, DBI, knitr)** → Cleaning, analysis, and visualization.  
+- **R Markdown** → Generation of the report in HTML.  
+
+
+
+**Layân ID YASSINE and his colleagues conducted this research as part of a statistical analysis project on COVID-19**
