@@ -6,6 +6,8 @@ This project aims to **analyze the trends and impacts of the COVID-19 pandemic i
 The study covers **the years 2020 and 2021**, with a particular focus on **the first three epidemic waves**.  
 The data was **imported from INSEE and Santé Publique France**, then stored in an **SQL** database before being analyzed with **R**.
 
+This research was conducted in French, and all datasets, labels, and documents are in French.
+
 ### Data and Methodology
 
 #### Data Sources
