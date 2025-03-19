@@ -2,7 +2,7 @@
 ## Statistical Analysis of COVID-19 in France
 
 ### Study result :
-#### 
+#### https://layan-iy.github.io/Inferential-Stats-on-COVID-19-in-France/covid19_analysis_report.html
 
 #### Project Description
 This project aims to **analyze the trends and impacts of the COVID-19 pandemic in mainland France** using descriptive and inferential statistical methods.
@@ -45,6 +45,9 @@ L’étude couvre **les années 2020 et 2021**, avec un focus particulier sur **
 Les données ont été **importées depuis l’INSEE et Santé Publique France**, puis stockées dans une base de données **SQL** avant d’être analysées avec **R**.  
 
 Cette recherche a été réalisée en français, et tous les ensembles de données, libellés et documents sont en français.  
+
+### Résultat de l'étude :
+#### https://layan-iy.github.io/Inferential-Stats-on-COVID-19-in-France/covid19_analysis_report.html
 
 #### Données et Méthodologie  
 
