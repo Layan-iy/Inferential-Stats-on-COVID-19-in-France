@@ -1,6 +1,9 @@
 # ENGLISH
 ## Statistical Analysis of COVID-19 in France
 
+### Study result :
+#### 
+
 #### Project Description
 This project aims to **analyze the trends and impacts of the COVID-19 pandemic in mainland France** using descriptive and inferential statistical methods.
 
